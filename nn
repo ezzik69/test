@@ -1,0 +1,35 @@
+from tkinter import *
+from tkinter import ttk
+
+class RButtons:
+    def __init__(self, master, options, command):
+        self.var = StringVar()
+        self.buttons = []
+        self.frame = Frame()
+        self.frame.pack(side=LEFT)
+        for text, value in options.items():
+            button = Radiobutton(self.frame,width=10,height=3, text=text, variable=self.var, value=value,
+                                 indicatoron=0, command=lambda val=value: command(val))
+            button.pack()
+            self.buttons.append(button)
+
+
+root = Tk()
+root.geometry('200x170')
+options = {
+    "Вася": "+4 9087654321",
+    "Петя": "+5 9123456789",
+    "Маша": "+6 9991234567"
+}
+
+
+def update_label(value):
+    label.config(text=value)
+
+
+radio_buttons = RButtons(root, options, update_label)
+label_frame = Frame()
+label_frame.pack(side=LEFT)
+label = ttk.Label(label_frame, text="", justify="left")
+label.pack(pady=10,padx=10)
+root.mainloop()
