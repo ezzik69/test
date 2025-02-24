@@ -1,0 +1,225 @@
+from tkinter import *
+import math
+
+root = Tk()
+width = root.winfo_screenwidth()
+height = root.winfo_screenheight()
+
+root.geometry(f'{width}x{height}')
+
+root.resizable(False, False)
+
+canvas_frame = Canvas(width=width, height=100, bg='lightgreen')
+canvas_frame.pack(side=TOP)
+
+canvas_frame.create_oval(20, 15, 100, 95, fill='green', width=2, outline='black')
+
+canvas_frame.create_text(60, 55, text='Логотип', font=('Cosmic Sans MC', 11, 'bold'))
+
+
+def create_superellipse(canvas, x_center, y_center, a, b, n, steps=500, **kwargs):
+    """
+    Создает суперэллипс на Canvas.
+
+    :param canvas: Объект Canvas, на котором рисуется суперэллипс.
+    :param x_center: Центр суперэллипса по оси X.
+    :param y_center: Центр суперэллипса по оси Y.
+    :param a: Горизонтальная полуось.
+    :param b: Вертикальная полуось.
+    :param n: Параметр формы (чем больше n, тем ближе к прямоугольнику).
+    :param steps: Количество шагов для аппроксимации (чем больше, тем точнее).
+    :param kwargs: Дополнительные параметры для create_polygon (например, fill, outline).
+    """
+    points = []
+    for i in range(steps):
+        # Вычисляем угол от 0 до 2π
+        theta = 2 * math.pi * i / steps
+        # Вычисляем x и y для суперэллипса
+        x = a * math.copysign(abs(math.cos(theta)) ** (2 / n), math.cos(theta))
+        y = b * math.copysign(abs(math.sin(theta)) ** (2 / n), math.sin(theta))
+        # Преобразуем в координаты на Canvas
+        points.append(x_center + x)
+        points.append(y_center + y)
+    # Рисуем суперэллипс как многоугольник
+    canvas.create_polygon(points, **kwargs)
+
+
+x_center = 500  # Центр по X
+y_center = 60  # Центр по Y
+a = 200  # Горизонтальная полуось
+b = 30  # Вертикальная полуось
+n = 3.3  # Параметр формы (n > 2 делает углы более прямыми)
+
+create_superellipse(canvas_frame, x_center, y_center, a, b, n, fill='white', outline='black')
+
+canvas_frame.create_text(500, 65, text='Название организации', font=('Cosmic Sans MC', 20))
+
+canvas_main = Canvas(width=(width // 2) // 1.5, height=height // 2 * 1.65, bg='grey60')
+canvas_main.place(x=50,y=120)
+
+main_info_var = IntVar()
+main_info_var.set(0)
+
+second_info_var = IntVar()
+second_info_var.set(0)
+
+third_info_var = IntVar()
+third_info_var.set(0)
+
+fourth_info_var = IntVar()
+fourth_info_var.set(0)
+
+canvas_info = Canvas(width=(width // 2) // 1.5, height=height // 2 * 1.65, bg='grey60')
+canvas_info.place(x=1210,y=120)
+
+
+def clear_canvas(canvas):
+    canvas.delete('all')
+
+    for widget in canvas.winfo_children():
+        widget.destroy()
+
+def open_main_info():
+    label = Label(text='''job title
+
+    name second_name
+    phone number
+    
+    job place
+    ''', bg='green', font=('Cosmic Sans MC', 12))
+
+    label2 = Label(text='''job title
+
+    name second_name
+    phone number
+    
+    job place
+    ''', bg='green', font=('Cosmic Sans MC', 12))
+
+    if main_info_var.get() == 1:
+        clear_canvas(canvas_info)
+        canvas_info.create_rectangle(50, 20, 500, 160, fill='green')
+        canvas_info.create_window(140,90, window=label)
+        canvas_info.create_rectangle(50, 180, 500, 320, fill='green')
+        canvas_info.create_window(140,250, window=label2)
+        main_info_var.set(0)
+
+def open_second_info():
+    if second_info_var.get() == 1:
+        clear_canvas(canvas_info)
+        canvas_info.create_rectangle(50, 20, 500, 150, fill='blue')
+        second_info_var.set(0)
+
+def open_third_info():
+
+    if third_info_var.get() == 1:
+        clear_canvas(canvas_info)
+        canvas_info.create_rectangle(50, 20, 500, 150, fill='red')
+        third_info_var.set(0)
+
+def open_fourth_info():
+    label = Label(text='''job title
+
+    name second_name
+    phone number
+    job place
+    ''', bg='green', font=('Cosmic Sans MC', 12))
+
+    if fourth_info_var.get() == 1:
+        clear_canvas(canvas_info)
+        canvas_info.create_rectangle(50, 20, 500, 150, fill='green')
+        canvas_info.create_window(140,80, window=label)
+        fourth_info_var.set(0)
+
+
+main_button = Checkbutton(
+    canvas_main, text='Владельцы',
+    indicatoron=False, width=20, height=2,
+    variable=main_info_var,
+    command=open_main_info,
+    bg='green',
+    activebackground='lightgreen'
+)
+
+second_button = Checkbutton(
+    canvas_main, text='Руководители',
+    indicatoron=False, width=20, height=2,
+    variable=second_info_var,
+    command=open_second_info,
+    bg='green',
+    activebackground='lightgreen'
+)
+
+third_button = Checkbutton(
+    canvas_main, text='Помощники',
+    indicatoron=False, width=20, height=2,
+    variable=third_info_var,
+    command=open_third_info,
+    bg='green',
+    activebackground='lightgreen'
+)
+
+fourth_button = Checkbutton(
+    canvas_main, text='Сотрудники',
+    indicatoron=False, width=20, height=2,
+    variable=fourth_info_var,
+    command=open_fourth_info,
+    bg='green',
+    activebackground='lightgreen'
+)
+
+def get_button_top_center(button):
+    button.update_idletasks()
+
+    x = button.winfo_x()
+    y = button.winfo_y()
+
+    b_width = button.winfo_width()
+
+    center_x = x + b_width // 2
+    top_y = y
+
+    return center_x, top_y
+
+def get_button_bottom_center(button):
+    button.update_idletasks()
+
+    x = button.winfo_x()
+    y = button.winfo_y()
+
+    b_width = button.winfo_width()
+    b_height = button.winfo_height()
+
+    center_x = x + b_width // 2
+    bottom_y = y + b_height
+
+    return center_x, bottom_y
+
+def save_coords():
+    x1, y1 = get_button_bottom_center(main_button)
+    x2, y2 = get_button_top_center(second_button)
+
+    def draw_lines():
+        canvas_main.create_line(x1, y1, x2, y2, fill='black')
+        x2t,y2t = get_button_top_center(third_button)
+        canvas_main.create_line(x1, y1, x2t, y2t, fill='black')
+        x1s,y1s = get_button_bottom_center(second_button)
+        x2f,y2f = get_button_top_center(fourth_button)
+        canvas_main.create_line(x1s,y1s,x2f,y2f,fill='black')
+
+    draw_lines()
+
+
+root.after(100, save_coords)
+
+canvas_main.create_window(canvas_main.winfo_reqwidth() // 2, 30, window=main_button)
+
+canvas_main.create_window((canvas_main.winfo_reqwidth() // 2) - 200, 110, window=second_button)
+
+canvas_main.create_window((canvas_main.winfo_reqwidth()-200 // 2), 110, window=third_button)
+
+canvas_main.create_window((canvas_main.winfo_reqwidth() // 2)-100, 180, window=fourth_button)
+
+root.mainloop()
+
+
