@@ -1,64 +1,55 @@
 import tkinter as tk
 
-class LabelInRectangle:
-    def __init__(self, canvas, x_start=50, y_start=20, width=450, height=140, x_padding=0, y_padding=20):
-        """
-        Инициализация класса.
-        :param canvas: Canvas, на котором будут рисоваться прямоугольники и лейблы.
-        :param x_start: Начальная координата X первого прямоугольника.
-        :param y_start: Начальная координата Y первого прямоугольника.
-        :param width: Ширина прямоугольника.
-        :param height: Высота прямоугольника.
-        :param x_padding: Отступ по горизонтали между прямоугольниками.
-        :param y_padding: Отступ по вертикали между прямоугольниками.
-        """
-        self.canvas = canvas
-        self.x_start = x_start
-        self.y_start = y_start
-        self.width = width
-        self.height = height
-        self.x_padding = x_padding
-        self.y_padding = y_padding
-        self.labels = []  # Список для хранения созданных лейблов
-        self.rectangles = []  # Список для хранения координат прямоугольников
+def create_label_in_rectangle(canvas, entries, rectangles, x_start=50, y_start=20, width=450, height=140, y_padding=20):
+    """
+    Создает лейбл внутри прямоугольника на Canvas.
+    :param canvas: Canvas, на котором будут рисоваться прямоугольники и лейблы.
+    :param entries: Список полей Entry для ввода данных (job_title, name_second_name, phone_number, job_place).
+    :param rectangles: Список для хранения координат прямоугольников.
+    :param x_start: Начальная координата X первого прямоугольника.
+    :param y_start: Начальная координата Y первого прямоугольника.
+    :param width: Ширина прямоугольника.
+    :param height: Высота прямоугольника.
+    :param y_padding: Отступ по вертикали между прямоугольниками.
+    """
+    # Получаем текст из полей ввода
+    job_title = entries[0].get()
+    name_second_name = entries[1].get()
+    phone_number = entries[2].get()
+    job_place = entries[3].get()
 
-    def create_label_in_rectangle(self, job_title, name_second_name, phone_number, job_place):
-        """
-        Создает лейбл внутри прямоугольника.
-        :param job_title: Текст для строки "job title".
-        :param name_second_name: Текст для строки "name second_name".
-        :param phone_number: Текст для строки "phone number".
-        :param job_place: Текст для строки "job place".
-        """
-        # Формируем текст для лейбла
-        label_text = f"{job_title}\n{name_second_name}\n{phone_number}\n\n{job_place}"
+    # Проверяем, что все поля заполнены
+    if not (job_title and name_second_name and phone_number and job_place):
+        return
 
-        # Создаем лейбл
-        label = tk.Label(
-            text=label_text,
-            bg='green',
-            font=('Cosmic Sans MC', 12),
-            justify=tk.LEFT
-        )
+    # Формируем текст для лейбла
+    label_text = f"{job_title}\n{name_second_name}\n{phone_number}\n\n{job_place}"
 
-        # Рассчитываем координаты нового прямоугольника
-        if not self.rectangles:
-            x1, y1 = self.x_start, self.y_start
-        else:
-            last_rect = self.rectangles[-1]
-            x1, y1 = last_rect[0], last_rect[3] + self.y_padding
+    # Создаем лейбл
+    label = tk.Label(
+        text=label_text,
+        bg='green',
+        font=('Cosmic Sans MC', 12),
+        justify=tk.LEFT
+    )
 
-        x2, y2 = x1 + self.width, y1 + self.height
+    # Рассчитываем координаты нового прямоугольника
+    if not rectangles:
+        x1, y1 = x_start, y_start
+    else:
+        last_rect = rectangles[-1]
+        x1, y1 = last_rect[0], last_rect[3] + y_padding
 
-        # Создаем прямоугольник на Canvas
-        rectangle = self.canvas.create_rectangle(x1, y1, x2, y2, fill='green')
+    x2, y2 = x1 + width, y1 + height
 
-        # Размещаем лейбл внутри прямоугольника
-        window = self.canvas.create_window(x1 + 90, y1 + (y2 - y1) // 2, window=label)
+    # Создаем прямоугольник на Canvas
+    rectangle = canvas.create_rectangle(x1, y1, x2, y2, fill='green')
 
-        # Сохраняем данные о лейбле и прямоугольнике
-        self.labels.append(label)
-        self.rectangles.append((x1, y1, x2, y2))
+    # Размещаем лейбл внутри прямоугольника
+    canvas.create_window(x1 + 90, y1 + (y2 - y1) // 2, window=label)
+
+    # Сохраняем координаты прямоугольника
+    rectangles.append((x1, y1, x2, y2))
 
 # Пример использования
 if __name__ == "__main__":
@@ -69,8 +60,8 @@ if __name__ == "__main__":
     canvas = tk.Canvas(root, width=600, height=800, bg='white')
     canvas.pack()
 
-    # Создаем экземпляр класса
-    label_creator = LabelInRectangle(canvas)
+    # Список для хранения координат прямоугольников
+    rectangles = []
 
     # Создаем поля ввода
     entry_job_title = tk.Entry(root)
@@ -82,15 +73,12 @@ if __name__ == "__main__":
     entry_job_place = tk.Entry(root)
     entry_job_place.pack()
 
+    # Список полей ввода
+    entries = [entry_job_title, entry_name_second_name, entry_phone_number, entry_job_place]
+
     # Функция для создания нового лейбла
     def add_label():
-        job_title = entry_job_title.get()
-        name_second_name = entry_name_second_name.get()
-        phone_number = entry_phone_number.get()
-        job_place = entry_job_place.get()
-
-        if job_title and name_second_name and phone_number and job_place:
-            label_creator.create_label_in_rectangle(job_title, name_second_name, phone_number, job_place)
+        create_label_in_rectangle(canvas, entries, rectangles)
 
     # Кнопка для добавления лейбла
     btn_add = tk.Button(root, text="Add Label", command=add_label)
